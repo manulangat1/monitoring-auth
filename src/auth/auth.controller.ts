@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDTO } from './dto/sign-up.dto';
 import {
@@ -8,8 +8,10 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { LoginDTO } from './dto/login.dto';
+import { Public } from '../common/decorators/Public.decorator';
 
 @Controller('auth')
+@Public()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -23,7 +25,7 @@ export class AuthController {
   })
   @ApiBadRequestResponse({ description: 'Invalid data supplied' })
   async signUp(@Body() dto: SignUpDTO) {
-    await this.authService.singUp(dto);
+    return await this.authService.singUp(dto);
   }
 
   @Post('/login')
@@ -33,6 +35,13 @@ export class AuthController {
   @ApiCreatedResponse({ description: 'Login success' })
   @ApiBadRequestResponse({ description: 'Bad request supplied' })
   async login(@Body() dto: LoginDTO) {
-    await this.authService.singIn(dto);
+    return await this.authService.singIn(dto);
+  }
+
+  @Post('/verify/:token')
+  @ApiCreatedResponse({ description: 'Login success' })
+  @ApiBadRequestResponse({ description: 'Bad request supplied' })
+  async verifyToken(@Param('token') token: string) {
+    return await this.authService.verifyToken(token);
   }
 }

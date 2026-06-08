@@ -6,6 +6,8 @@ import { AppConfigModule } from './app-config/app-config.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { MagicLinksModule } from './magic-links/magic-links.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './common/guards/auth.guard';
 
 @Module({
   imports: [
@@ -19,6 +21,12 @@ import { MagicLinksModule } from './magic-links/magic-links.module';
     MagicLinksModule,
   ],
   controllers: [],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}

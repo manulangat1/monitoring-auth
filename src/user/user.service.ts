@@ -38,7 +38,7 @@ export class UserService {
     return await this.userRepository.save(newUser);
   }
 
-  async getCurrentUser(user: User) {
+  getCurrentUser(user: User) {
     return user;
   }
 }

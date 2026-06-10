@@ -26,8 +26,7 @@ import { JwtModule } from '@nestjs/jwt';
       useFactory: (configService: ConfigService) => {
         const secret = configService.get('jwtSecretKey');
         const expiresIn = configService.get('jwtExpiresIn');
-        console.log('JWT secret:', secret);
-        console.log('JWT expiresIn:', expiresIn);
+
         return {
           secret: configService.getOrThrow('jwtSecretKey'),
           signOptions: { expiresIn: configService.getOrThrow('jwtExpiresIn') },

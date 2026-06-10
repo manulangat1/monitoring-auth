@@ -37,4 +37,8 @@ export class UserService {
     const newUser = this.userRepository.create({ ...dto });
     return await this.userRepository.save(newUser);
   }
+
+  getCurrentUser(user: User) {
+    return user;
+  }
 }

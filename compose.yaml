@@ -1,0 +1,46 @@
+
+services:
+  server:
+    build:
+      context: .
+    image: manulangat/blog_by_langat:monitoring-auth
+    environment:
+      NODE_ENV: production
+      PORT: 3005
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_NAME: postgres
+      JWT_SECRET_KEY: ftcvgybhnjkbhjn
+      JWT_EXPIRES_IN: 2h
+      REDIS_HOST: comic-fox-145078.upstash.io
+      REDIS_PASSWORD: gQAAAAAAAja2AAIgcDFjMjE5ODQzZGQzYjg0NDc4YmIyZDFkYWY5ZWNmMDUxNw
+    ports:
+      - 3005:3005
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:17
+    restart: always
+    # user: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+      # - POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      # -  POSTGRES_PASSWORD: postgres
+    expose:
+      - 5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  db-data:
+
+

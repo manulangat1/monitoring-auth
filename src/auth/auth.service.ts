@@ -1,4 +1,11 @@
-import { BadRequestException, Injectable, Param, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  OnModuleInit,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { SignUpDTO } from './dto/sign-up.dto';
 import { okResponse } from '../common/dto/ok-response';
@@ -11,15 +18,23 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginObjectDTO } from '../common/dto/login-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { DataSource } from 'typeorm';
+import { ClientProxy } from '@nestjs/microservices';
+import { SendMailPayload } from '../common/interfaces/general.interface';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements OnModuleInit {
   constructor(
+    @Inject('MAIL_SERVICE') private readonly mailClient: ClientProxy,
+
     private userService: UserService,
     private magicLinkService: MagicLinksService,
     private jwtService: JwtService,
     private dataSource: DataSource,
   ) {}
+
+  async onModuleInit() {
+    await this.mailClient.connect(); // 👈 establish Redis connection on startup
+  }
 
   async singUp(dto: SignUpDTO) {
     const { email } = dto;
@@ -49,6 +64,13 @@ export class AuthService {
 
     // generate magic Link.
     const token = await this.magicLinkService.saveLink(userExists);
+
+    this.mailClient.emit<void, SendMailPayload>('send_mail', {
+      to: email,
+      subject: 'Welcome!',
+      html: `<h1>Hey ${email}, Follow this http://localhost:3002/api/v1/auth/verify/${token} to activate your account.</h1>`,
+      text: `Hey ${email}, Follow this http://localhost:3002/api/v1/auth/verify/${token} to activate your account.`,
+    });
 
     // return response back to the user.
     return okResponse(token);

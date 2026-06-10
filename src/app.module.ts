@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module';
 import { MagicLinksModule } from './magic-links/magic-links.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './common/guards/auth.guard';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
@@ -19,6 +20,18 @@ import { AuthGuard } from './common/guards/auth.guard';
     AuthModule,
     UserModule,
     MagicLinksModule,
+    ClientsModule.register([
+      {
+        name: 'MAIL_SERVICE',
+        transport: Transport.REDIS,
+        options: {
+          host: process.env.REDIS_HOST,
+          port: 6379,
+          password: process.env.REDIS_PASSWORD,
+          tls: {},
+        },
+      },
+    ]),
   ],
   controllers: [],
   providers: [

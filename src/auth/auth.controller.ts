@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDTO } from './dto/sign-up.dto';
 import {
@@ -38,8 +38,8 @@ export class AuthController {
     return await this.authService.singIn(dto);
   }
 
-  @Post('/verify/:token')
-  @ApiCreatedResponse({ description: 'Login success' })
+  @Get('/verify/:token')
+  // @ApiCreatedResponse({ description: 'Login success' })
   @ApiBadRequestResponse({ description: 'Bad request supplied' })
   async verifyToken(@Param('token') token: string) {
     return await this.authService.verifyToken(token);
